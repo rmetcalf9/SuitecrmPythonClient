@@ -9,7 +9,7 @@ sp_install_requires = [
   'PythonAPIClientBase==0.0.9'
 ]
 sp_tests_require = [
-  'pytest==1.3.7',
+  'pytest==7.1.2',
   'python_Testing_Utilities==0.1.10'
 ]
 
