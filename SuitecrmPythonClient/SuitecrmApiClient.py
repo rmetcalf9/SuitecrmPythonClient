@@ -1,10 +1,12 @@
 import PythonAPIClientBase
 from .SuitecrmLoginSession import SuitecrmLoginSessionBasedOnClientIdAndSecret
+from .ResourceWrappers import moduleFactory
 import json
 
-api_prefix = '/legacy/Api/V8/meta'
 
 class SuitecrmApiClient(PythonAPIClientBase.APIClientBase):
+  api_prefix = '/legacy/Api/V8'
+
   refreshAuthTokenIfRequired = None
 
   def __init__(self, baseURL, mock=None):
@@ -15,11 +17,19 @@ class SuitecrmApiClient(PythonAPIClientBase.APIClientBase):
 
   def getModules(self, loginSession):
     result = self.sendGetRequest(
-      url=api_prefix + '/modules',
+      url=self.api_prefix + '/meta/modules',
       loginSession=loginSession,
       injectHeadersFn=None
     )
     if result.status_code != 200:
       self.raiseResponseException(result)
 
-    return json.loads(result.text)
+    resultDict = json.loads(result.text)
+    if resultDict["data"]["type"] != "modules":
+      raise Exception("Unexpected response")
+
+    modules = {}
+    for moduleKey in resultDict["data"]["attributes"].keys():
+      modules[moduleKey] = moduleFactory(api_client=self, key=moduleKey, moduleData=resultDict["data"]["attributes"][moduleKey])
+
+    return modules

@@ -47,6 +47,8 @@ class SuitecrmLoginSessionBasedOnClientIdAndSecret(LoginSession):
     self.authResponse = json.loads(result.text)
 
   def injectHeaders(self, headers):
+    headers["Content-type"] = "application/vnd.api+json"
+    headers["Accept"] = "application/vnd.api+json"
     headers["Authorization"] = "Bearer " + self.authResponse["access_token"]
 
   def refresh(self):
